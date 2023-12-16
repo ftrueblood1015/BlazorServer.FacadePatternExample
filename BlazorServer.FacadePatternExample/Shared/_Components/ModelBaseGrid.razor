@@ -1,0 +1,177 @@
+﻿@using BlazorServer.FacadePatternExample.Services
+@using FacadePatternExample.Domain.Models;
+@typeparam T where T : ModelBase
+
+<MudDataGrid @attributes="Splats.DataGrid(Title!)" T="T" Items="@Entities" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@QuickFilter" Hideable="true">
+    <ToolBarContent>
+        <MudText @attributes="Splats.PageHeader(Title!)">@Title</MudText>
+            <MudSpacer />
+            <MudTextField @attributes='Splats.SearchField()' @bind-Value="SearchString" Class="mt-0"></MudTextField>
+            <MudButton @attributes="Splats.NewButton()" class="ml-2" OnClick="Add">Add</MudButton>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="Name" Sortable="true" Filterable="false" InitialDirection="SortDirection.Ascending" />
+            <PropertyColumn Property="x => x.Description" Title="Description" />
+            <PropertyColumn Property="x => x.IsActive" Title="Active" />
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudStack Row>
+                    <MudButton @attributes="Splats.DeleteButton()" Size="@Size.Small" OnClick="@(() => OnDeleteClicked(context.Item))">Delete</MudButton>
+                    <MudButton @attributes="Splats.EditButton()" Size="@Size.Small" OnClick="@(() => Edit(context.Item))">Edit</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="T" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Inject]
+    private IServiceBase<T>? Service { get; set; }
+
+    [Inject]
+    private NavigationManager? NavigationManager { get; set; }
+
+    [Inject]
+    private IDialogService? DialogService { get; set; }
+
+    [Inject]
+    private ISnackbar? SnackbarService { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Route { get; set; }
+
+    public List<T>? Entities { get; set; }
+
+    private string? SearchString { get; set; }
+
+    string state = "Message box hasn't been opened yet";
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetData();
+    }
+
+    public void GetData()
+    {
+        if (Service == null)
+        {
+            throw new Exception($"{nameof(Service)}  is null!");
+        }
+        var Response = Service.GetAll();
+        Entities = Response != null ? Response.ToList() : new List<T>();
+        StateHasChanged();
+    }
+
+    private Func<T, bool> QuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(SearchString))
+                return true;
+
+            if (x.Description!.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (x.Name!.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+    public void Add()
+    {
+        if (NavigationManager == null)
+        {
+            throw new Exception($"{nameof(NavigationManager)}  is null!");
+        }
+
+        if (String.IsNullOrEmpty(Route))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+        NavigationManager.NavigateTo($"/{Route}");
+    }
+
+    private async void OnDeleteClicked(T Item)
+    {
+        if (DialogService == null)
+        {
+            throw new Exception($"{nameof(DialogService)}  is null!");
+        }
+
+        bool? result = await DialogService.ShowMessageBox(
+        "Warning",
+        "Deleting can not be undone!",
+        yesText:"Delete!", cancelText:"Cancel"
+    );
+
+        state = result == null ? "Canceled" : "Deleted!";
+
+        if (state == "Canceled")
+        {
+            StateHasChanged();
+        }
+        else
+        {
+            Delete(Item);
+            GetData();
+        }
+    }
+
+    private bool Delete(T Item)
+    {
+        if (Service == null)
+        {
+            throw new Exception($"{nameof(Service)} is null!");
+        }
+
+        try
+        {
+            var result = Service.Delete(Item);
+
+            if (result)
+            {
+                ShowSnackbarMessage($"Deleted {Title}", Color.Success);
+            }
+            else
+            {
+                ShowSnackbarMessage($"Could Not Delete {Title}", Color.Error);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            ShowSnackbarMessage($"Could Not Delete {Title}: {ex}", Color.Error);
+            return false;
+        }
+    }
+
+    public void ShowSnackbarMessage(string Message, MudBlazor.Color Color)
+    {
+        if (SnackbarService == null)
+        {
+            throw new ArgumentNullException(nameof(SnackbarService));
+        }
+
+        SnackbarService.Add<MudChip>(new Dictionary<string, object>() {
+            { "Text", $"{Message}" },
+            { "Color", Color }
+        });
+    }
+
+    private void Edit(T Item)
+    {
+        if (NavigationManager == null)
+        {
+            throw new ArgumentNullException(nameof(NavigationManager));
+        }
+
+        NavigationManager.NavigateTo($"/{Route}/{Item.Id}");
+    }
+}

@@ -1,0 +1,6 @@
+﻿@page "/shippingproviderdetail"
+@page "/shippingproviderdetail/{ShippingProviderId:int}"
+@using FacadePatternExample.Domain.Models;
+@using BlazorServer.FacadePatternExample.Shared._Components;
+
+<ModelBaseForm T="ShippingProvider" CancelRoute="shippingprovidersummary" Title="ShippingProvider" EntityId="ShippingProviderId"></ModelBaseForm>

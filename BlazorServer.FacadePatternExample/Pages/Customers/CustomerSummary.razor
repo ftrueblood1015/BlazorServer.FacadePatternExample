@@ -1,0 +1,29 @@
+﻿@page "/customersummary"
+@using BlazorServer.FacadePatternExample.Domain.Models
+
+<MudDataGrid @attributes="Splats.DataGrid(Title!)" T="Customer" Items="@Entities" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@QuickFilter" Hideable="true">
+    <ToolBarContent>
+        <MudText @attributes="Splats.PageHeader(Title!)">@Title</MudText>
+            <MudSpacer />
+            <MudTextField @attributes='Splats.SearchField()' @bind-Value="SearchString" Class="mt-0"></MudTextField>
+            <MudButton @attributes="Splats.NewButton()" class="ml-2" OnClick="Add">Add</MudButton>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="Name" Sortable="true" Filterable="false" InitialDirection="SortDirection.Ascending" />
+            <PropertyColumn Property="x => x.Address" Title="Address" />
+            <PropertyColumn Property="x => x.Country" Title="Country" />
+            <PropertyColumn Property="x => x.CustomerSince" Title="Customer Since" />
+            <PropertyColumn Property="x => x.IsActive" Title="Active" />
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudStack Row>
+                    <MudButton @attributes="Splats.DeleteButton()" Size="@Size.Small" OnClick="@(() => OnDeleteClicked(context.Item))">Delete</MudButton>
+                    <MudButton @attributes="Splats.EditButton()" Size="@Size.Small" OnClick="@(() => Edit(context.Item))">Edit</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Customer" />
+    </PagerContent>
+</MudDataGrid>

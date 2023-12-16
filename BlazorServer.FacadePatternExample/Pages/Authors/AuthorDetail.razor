@@ -1,0 +1,6 @@
+﻿@page "/authordetail"
+@page "/authordetail/{AuthorId:int}"
+@using FacadePatternExample.Domain.Models;
+@using BlazorServer.FacadePatternExample.Shared._Components;
+
+<ModelBaseForm T="Author" CancelRoute="authorsummary" Title="Author" EntityId="AuthorId"></ModelBaseForm>

@@ -1,0 +1,6 @@
+﻿@page "/genredetail"
+@page "/genredetail/{GenreId:int}"
+@using FacadePatternExample.Domain.Models;
+@using BlazorServer.FacadePatternExample.Shared._Components;
+
+<ModelBaseForm T="Genre" CancelRoute="genresummary" Title="Genre" EntityId="GenreId"></ModelBaseForm>

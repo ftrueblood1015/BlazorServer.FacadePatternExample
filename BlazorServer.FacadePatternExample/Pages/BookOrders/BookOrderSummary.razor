@@ -1,0 +1,23 @@
+﻿@page "/bookordersummary"
+@using BlazorServer.FacadePatternExample.Domain.Models
+
+<MudDataGrid @attributes="Splats.DataGrid(Title!)" T="BookOrder" Items="@Entities" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@QuickFilter" Hideable="true">
+    <ToolBarContent>
+        <MudText @attributes="Splats.PageHeader(Title!)">@Title</MudText>
+            <MudSpacer />
+            <MudTextField @attributes='Splats.SearchField()' @bind-Value="SearchString" Class="mt-0"></MudTextField>
+            <MudButton @attributes="Splats.NewButton()" class="ml-2" OnClick="Add">Add</MudButton>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="Name" Sortable="true" Filterable="false" InitialDirection="SortDirection.Ascending" />
+            <PropertyColumn Property="x => x.Customer!.Name" Title="Customer" />
+            <PropertyColumn Property="x => x.Book!.Name" Title="Book" />
+            <PropertyColumn Property="x => x.ShippingProvider!.Name" Title="Shipping Provider" />
+            <PropertyColumn Property="x => x.DiscountPercentage" Title="Discount %" />
+            <PropertyColumn Property="x => x.DiscountTotal" Title="Discount Total" />
+            <PropertyColumn Property="x => x.Total" Title="Total" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="BookOrder" />
+    </PagerContent>
+</MudDataGrid>

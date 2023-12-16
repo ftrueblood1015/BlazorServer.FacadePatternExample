@@ -1,0 +1,32 @@
+﻿@page "/customerdetail"
+@page "/customerdetail/{CustomerId:int}"
+
+<MudText @attributes='Splats.PageHeader($"new{Title}")'>@Title</MudText>
+
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudPaper Class="pa-4">
+                <MudForm @ref="Form" @bind-IsValid="@success" @bind-Errors="@errors">
+                    <MudCheckBox @bind-Checked="@Entity!.IsActive" @attributes='Splats.CheckBox("Active")'></MudCheckBox>
+                    <MudTextField @bind-Value="@Entity!.Name" @attributes='Splats.TextRequired("Name")' />
+                    <MudTextField @bind-Value="@Entity!.Country" @attributes='Splats.TextRequired("Country")' />
+                    <MudTextField @bind-Value="@Entity!.Address" @attributes='Splats.TextRequired("Address")' />
+                    <MudTextField @bind-Value="@Entity!.Description" @attributes='Splats.TextAreaRequired("Description")' />
+                </MudForm>
+            </MudPaper>
+            <MudPaper Class="pa-4 mt-4">
+                <MudButton @attributes="Splats.NewButton()" OnClick="Save">Save</MudButton>
+                <MudButton @attributes="Splats.ResetButton()" OnClick="@(()=>Form!.ResetAsync())" Class="mx-2">Reset</MudButton>
+                <MudButton @attributes="Splats.CancelButton()" OnClick="CancelClick">Cancel</MudButton>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+                @foreach (var error in errors)
+            {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
