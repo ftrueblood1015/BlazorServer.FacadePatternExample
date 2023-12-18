@@ -13,6 +13,7 @@
             <PropertyColumn Property="x => x.Customer!.Name" Title="Customer" />
             <PropertyColumn Property="x => x.Book!.Name" Title="Book" />
             <PropertyColumn Property="x => x.ShippingProvider!.Name" Title="Shipping Provider" />
+            <PropertyColumn Property="x => (x.Book!.Price * x.Quantity)" Title="Pre Discount" />
             <PropertyColumn Property="x => x.DiscountPercentage" Title="Discount %" />
             <PropertyColumn Property="x => x.DiscountTotal" Title="Discount Total" />
             <PropertyColumn Property="x => x.Total" Title="Total" />
